@@ -1,0 +1,30 @@
+version: '3'
+services: 
+  mysql_maestro:
+    image: mysql:5.7
+    container_name: maestro
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: replica
+    ports: 
+      - "3310:3306"
+    command: --server-id=1 --log-bin=mysql-bin --binlog-do-db=replica #Se coloca el nombre de la base de datos para la replica
+
+  mysql_esclavo:
+    image: mysql:5.7
+    container_name: esclavo
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: replica
+    ports: 
+      - "3307:3306"
+    command: --server-id=2 --log-bin=mysql-bin --binlog-do-db=replica #Se coloca el nombre de la base de datos para la replica
+
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: phpmyadmin
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOSTS: "mysql_maestro,mysql_esclavo"
+      PMA_ARBITRARY: '1'
